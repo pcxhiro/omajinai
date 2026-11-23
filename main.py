@@ -122,8 +122,8 @@ def main():
     url = f"https://www.youtube.com/watch?v={video_id}"
     print(f"[main] uploaded: {url} (privacy={actual_privacy})")
 
-    # 5) トップコメント（自分の場面の言葉を誘う一言のみ。外部リンクなし）
-    comment = script["comment_lead"]
+    # 5) トップコメント（固定文。2026-11-23 浩道の指定で確定。外部リンクなし）
+    comment = "あなたのおまじないも、コメントで教えてください。"
     try:
         yt.post_comment(video_id, comment)
         print("[main] top comment posted")
