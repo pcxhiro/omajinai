@@ -1,0 +1,42 @@
+name: omajinai-daily
+
+# 毎日 06:12（日本時間）に自動実行。手動実行も可能（Actions画面の Run workflow）。
+on:
+  schedule:
+    - cron: "12 21 * * *"   # 21:12 UTC = 翌朝 06:12 JST（正時の混雑を避けて12分ずらし）
+  workflow_dispatch:
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: チェックアウト
+        uses: actions/checkout@v4
+
+      - name: Python セットアップ
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: 日本語フォントと FFmpeg のインストール
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y fonts-noto-cjk ffmpeg
+          ffmpeg -version | head -1
+          ffprobe -version | head -1
+
+      - name: ライブラリのインストール
+        run: pip install -r requirements.txt
+
+      - name: 今日の動画を作って投稿
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          GEMINI_MODEL: ${{ secrets.GEMINI_MODEL }}
+          YT_CLIENT_ID: ${{ secrets.YT_CLIENT_ID }}
+          YT_CLIENT_SECRET: ${{ secrets.YT_CLIENT_SECRET }}
+          YT_REFRESH_TOKEN: ${{ secrets.YT_REFRESH_TOKEN }}
+          SHEETS_REFRESH_TOKEN: ${{ secrets.SHEETS_REFRESH_TOKEN }}
+          SHEET_ID: ${{ secrets.SHEET_ID }}
+          VIDEO_PRIVACY: ${{ secrets.VIDEO_PRIVACY }}
+        run: python main.py
